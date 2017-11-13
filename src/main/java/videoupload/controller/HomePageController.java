@@ -37,11 +37,17 @@ public class HomePageController {
 		return "login";
 	}
 
-	@RequestMapping(value = "/admin", method = RequestMethod.GET)
+	@RequestMapping(value = "/upload", method = RequestMethod.GET)
 	public String adminPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());
-		return "admin";
+		return "upload";
 	}
+	
+//	@RequestMapping(value = "/login", method = RequestMethod.POST)
+//	public String adminPage() {
+//		//model.addAttribute("user", getPrincipal());
+//		return "admin";
+//	}
 
 	@RequestMapping(value = "/db", method = RequestMethod.GET)
 	public String dbaPage(ModelMap model) {

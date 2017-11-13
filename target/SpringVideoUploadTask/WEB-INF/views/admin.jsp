@@ -16,7 +16,7 @@
 			href="<c:url value="/logout" />">Logout</a>
 	</div>
 	<div>
- 		<form action="uploadfile" method="post" enctype="multipart/form-data">
+ 		<form action="s3/uploadfile" method="post" enctype="multipart/form-data">
 			<table>
 				<tr>
 					<td>Upload File</td>
