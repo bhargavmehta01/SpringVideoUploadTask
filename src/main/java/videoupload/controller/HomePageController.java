@@ -3,7 +3,7 @@ package videoupload.controller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import videoupload.model.FileUpload;
+import videoupload.model.Response;
 import videoupload.model.User;
 import videoupload.model.UserProfile;
 import videoupload.service.UserProfileService;
@@ -49,41 +51,54 @@ public class HomePageController {
 		return "upload";
 	}
 	
-	@RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
-	public @ResponseBody
-	String uploadFileHandler(@RequestParam("name") String name,
-			@RequestParam("file") MultipartFile file) {
+	@RequestMapping(value="/upload", method=RequestMethod.POST, produces = "application/json")
+    @ResponseBody
+    public Response handleFileUpload(@RequestParam("file") MultipartFile[] file) {
 
-		if (!file.isEmpty()) {
-			try {
-				byte[] bytes = file.getBytes();
+        List<String> result = new ArrayList<String>();
+        FileUpload fileUpload = new FileUpload();
+        for (int i = 0; i < file.length; i++) {
+            result.add(fileUpload.process(file[i]));
+        }
 
-				// Creating the directory to store file
-				String rootPath = System.getProperty("catalina.home");
-				File dir = new File(rootPath + File.separator + "tmpFiles");
-				if (!dir.exists())
-					dir.mkdirs();
-
-				// Create the file on server
-				File serverFile = new File(dir.getAbsolutePath()
-						+ File.separator + name);
-				BufferedOutputStream stream = new BufferedOutputStream(
-						new FileOutputStream(serverFile));
-				stream.write(bytes);
-				stream.close();
-
-//				logger.info("Server File Location="
-//						+ serverFile.getAbsolutePath());
-
-				return "You successfully uploaded file=" + name;
-			} catch (Exception e) {
-				return "You failed to upload " + name + " => " + e.getMessage();
-			}
-		} else {
-			return "You failed to upload " + name
-					+ " because the file was empty.";
-		}
-	}
+        return new Response(result);
+    }
+	
+//	@RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
+//	public @ResponseBody
+//	String uploadFileHandler(@RequestParam("name") String name,
+//			@RequestParam("file") MultipartFile file) {
+//
+//		if (!file.isEmpty()) {
+//			try {
+//				byte[] bytes = file.getBytes();
+//
+//				// Creating the directory to store file
+//				String rootPath = System.getProperty("catalina.home");
+//				File dir = new File(rootPath + File.separator + "tmpFiles");
+//				if (!dir.exists())
+//					dir.mkdirs();
+//
+//				// Create the file on server
+//				File serverFile = new File(dir.getAbsolutePath()
+//						+ File.separator + name);
+//				BufferedOutputStream stream = new BufferedOutputStream(
+//						new FileOutputStream(serverFile));
+//				stream.write(bytes);
+//				stream.close();
+//
+////				logger.info("Server File Location="
+////						+ serverFile.getAbsolutePath());
+//
+//				return "You successfully uploaded file=" + name;
+//			} catch (Exception e) {
+//				return "You failed to upload " + name + " => " + e.getMessage();
+//			}
+//		} else {
+//			return "You failed to upload " + name
+//					+ " because the file was empty.";
+//		}
+//	}
 
 	
 //	@RequestMapping(value = "/login", method = RequestMethod.POST)

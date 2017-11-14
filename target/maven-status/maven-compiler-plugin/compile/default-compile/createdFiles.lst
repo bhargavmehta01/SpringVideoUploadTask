@@ -1,4 +1,5 @@
 videoupload/model/State.class
+videoupload/model/FileUpload.class
 videoupload/service/CustomUserDetailsService.class
 videoupload/dao/AbstractDao.class
 videoupload/util/RoleToUserProfileConverter.class
@@ -12,6 +13,7 @@ videoupload/controller/UploadController.class
 videoupload/dao/UserProfileDao.class
 videoupload/dao/UserDaoImpl.class
 videoupload/dao/UserProfileDaoImpl.class
+videoupload/model/Response.class
 videoupload/service/UserProfileService.class
 videoupload/controller/HomePageController.class
 videoupload/service/UserService.class

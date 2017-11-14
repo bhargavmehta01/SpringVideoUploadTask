@@ -1,4 +1,5 @@
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/controller/UploadController.java
+/Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/model/Response.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/service/CustomUserDetailsService.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/dao/UserDao.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/model/UserProfileType.java
@@ -12,6 +13,7 @@
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/dao/UserProfileDaoImpl.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/model/UserProfile.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/dao/UserDaoImpl.java
+/Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/model/FileUpload.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/dao/UserProfileDao.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/model/User.java
 /Users/bhargav/eclipse-workspace/SpringVideoUploadTask/src/main/java/videoupload/controller/HomePageController.java

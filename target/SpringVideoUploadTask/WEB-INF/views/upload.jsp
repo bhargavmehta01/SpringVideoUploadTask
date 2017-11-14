@@ -16,7 +16,7 @@
 			href="<c:url value="/logout" />">Logout</a>
 	</div>
 	<div>
- 		<form method="POST" action="uploadfile" enctype="multipart/form-data">
+ 		<form method="POST" action="upload?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data">
 		File to upload: <input type="file" name="file">
  
 		Name: <input type="text" name="name">
