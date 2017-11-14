@@ -16,15 +16,14 @@
 			href="<c:url value="/logout" />">Logout</a>
 	</div>
 	<div>
- 		<form action="s3/uploadfile" method="post" enctype="multipart/form-data">
-			<table>
-				<tr>
-					<td>Upload File</td>
-					<td><input type="file" name="samplefile"></td>
-					<td><button type="submit">SUBMIT</button></td>
-				</tr>
-			</table>
-		</form> 
+ 		<form method="POST" action="uploadfile" enctype="multipart/form-data">
+		File to upload: <input type="file" name="file">
+ 
+		Name: <input type="text" name="name">
+ 
+ 
+		<input type="submit" value="Upload"> Press here to upload the file!
+	</form>
 	</div>
 </body>
 </html>
