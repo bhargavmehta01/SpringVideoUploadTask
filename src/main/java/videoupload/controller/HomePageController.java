@@ -1,8 +1,7 @@
 package videoupload.controller;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +20,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import videoupload.model.User;
 import videoupload.model.UserProfile;
+import videoupload.model.UserVideo;
 import videoupload.service.UserProfileService;
 import videoupload.service.UserService;
+import videoupload.service.UserVideoService;
+import videoupload.util.S3UploadUtil;
 
 @Controller
 public class HomePageController {
@@ -38,73 +39,76 @@ public class HomePageController {
 	@Autowired
 	UserService userService;
 	
-	@RequestMapping(value = { "/", "/login" }, method = RequestMethod.GET)
-	public String homeLoginPage() {
-		return "login";
+	@Autowired
+	UserVideoService userVideoService;
+	
+	/*This is the landing page of the app. 
+	This route redirects the user to "newuser.jsp" page where he/she can register
+	*/
+	@RequestMapping(value = { "/", "/newuser" }, method = RequestMethod.GET)
+	public String homeLoginPage(ModelMap model) {
+		User user = new User();
+		model.addAttribute("user", user);
+		return "newuser";
 	}
 
+	/*This opens "upload.jsp" page from where a user can upload videos.
+	This page is only accessible by users having "ADMIN" role for their profile.
+	This route gets all the videos uploaded by the user.
+	*/
 	@RequestMapping(value = "/upload", method = RequestMethod.GET)
 	public String adminPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());
+		
+		User currentUser = userService.findByemail(getPrincipal());
+		List<UserVideo> videos = userVideoService.findAllByUserId(currentUser.getId());
+		model.addAttribute("videos",videos);
 		return "upload";
 	}
 	
+	/*This is the POST API route for uploading a video.
+	It returns the URL of the uploaded file to gain access to the file.
+	It returns an exception page if the video was not uploaded successfully 
+	and doesn't get stored in the database.
+	 */	
 	@RequestMapping(value="/upload", method=RequestMethod.POST)
-    @ResponseBody
     public String handleFileUpload(@RequestParam("name") String name,
-    		@RequestParam("file") MultipartFile file) {
+    		@RequestParam("file") MultipartFile file, ModelMap model) {
 
 		User currentUser = userService.findByemail(getPrincipal());
 
-		if (!file.isEmpty()) {
-			try {
-				byte[] bytes = file.getBytes();
-
-				// Creating the directory to store file
-				String rootPath = System.getProperty("catalina.home");
-				File dir = new File(rootPath + File.separator + "resources" + File.separator + "videos" + File.separator + currentUser.getId());
-				if (!dir.exists())
-					dir.mkdirs();
-
-				// Create the file on server
-				File serverFile = new File(dir.getAbsolutePath()
-						+ File.separator + file.getOriginalFilename());
-				BufferedOutputStream stream = new BufferedOutputStream(
-						new FileOutputStream(serverFile));
-				stream.write(bytes);
-				stream.close();
-
-				//logger.info("Server File Location="
-				//		+ serverFile.getAbsolutePath());
-
-				return "You successfully uploaded file=" + file.getOriginalFilename();
-			} catch (Exception e) {
-				return "You failed to upload " + file.getOriginalFilename() + " => " + e.getMessage();
-			}
-		} else {
-			return "You failed to upload " + file.getOriginalFilename()
-					+ " because the file was empty.";
+		String videoUrl = null;
+		
+		S3UploadUtil utilObj = new S3UploadUtil();
+		videoUrl = utilObj.uploadfile(file, currentUser.getId());
+		
+		try {
+			URL urlCheck = new URL(videoUrl);
+			
+			UserVideo video = new UserVideo();
+			video.setUrl(videoUrl);
+			video.setUser(currentUser);
+			userVideoService.saveVideo(video);
+			return "redirect:/upload";
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return videoUrl;
 		}
-    }
-	
-//	@RequestMapping(value = "/login", method = RequestMethod.POST)
-//	public String adminPage() {
-//		//model.addAttribute("user", getPrincipal());
-//		return "admin";
-//	}
-
-	@RequestMapping(value = "/db", method = RequestMethod.GET)
-	public String dbaPage(ModelMap model) {
-		model.addAttribute("user", getPrincipal());
-		return "dba";
 	}
 
+	/*If a user tries to access a page which is not allowed by his/her role, 
+	he/she gets refirected to Access denied page.
+	*/
 	@RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
 	public String accessDeniedPage(ModelMap model) {
 		model.addAttribute("user", getPrincipal());
 		return "accessDenied";
 	}
 
+	/*This route is responsible for logging out user securely 
+	by clearing the security token.
+	*/
 	@RequestMapping(value="/logout", method = RequestMethod.GET)
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -114,17 +118,15 @@ public class HomePageController {
 		return "redirect:/login?logout";
 	}
 
-	
-	@RequestMapping(value = "/newuser", method = RequestMethod.GET)
-	public String newRegistration(ModelMap model) {
-		User user = new User();
-		model.addAttribute("user", user);
-		return "newuser";
-	}
+//	This route gets the "login.jsp" page.
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String loginPage() {
+        return "login";
+    }
 
-	/*
-	 * This method will be called on form submission, handling POST request It
-	 * also validates the user input
+	
+	 /*This method will be called on User registration form submission.
+	 It handles POST request along with validating user input.
 	 */
 	@RequestMapping(value = "/newuser", method = RequestMethod.POST)
 	public String saveRegistration(@Valid User user,
@@ -151,6 +153,9 @@ public class HomePageController {
 		return "registrationsuccess";
 	}
 
+	/*This is an internal method used to get User details 
+	of the logged in user from the Security context
+	*/
 	private String getPrincipal(){
 		String userName = null;
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -162,9 +167,7 @@ public class HomePageController {
 		}
 		return userName;
 	}
-	
-	
-	
+
 	@ModelAttribute("roles")
 	public List<UserProfile> initializeProfiles() {
 		return userProfileService.findAll();

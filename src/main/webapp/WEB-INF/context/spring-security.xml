@@ -6,15 +6,16 @@
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
 
 	<http auto-config="true">
-		<intercept-url pattern="/home" access="permitAll" />
+
 		<intercept-url pattern="/" access="permitAll" />
 		<intercept-url pattern="/upload/**" access="hasRole('ADMIN')" />
 		<intercept-url pattern="/newuser" access="permitAll" />
-		<intercept-url pattern="/db/**" access="hasRole('ADMIN') and hasRole('DBA')" />
 
 		<form-login login-page="/login"
                      username-parameter="email"
-                     password-parameter="password" />
+                     password-parameter="password"
+                     default-target-url="/upload"
+    					 always-use-default-target = "true" />
        	<access-denied-handler error-page="/Access_Denied" />              
 		<csrf />
 	</http>

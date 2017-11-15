@@ -3,6 +3,7 @@ package videoupload.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -22,10 +24,6 @@ public class User {
 
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-
-//	@NotEmpty
-//	@Column(name="SSO_ID", unique=true, nullable=false)
-//	private String ssoId;
 	
 	@NotEmpty
 	@Column(name="PASSWORD", nullable=false)
@@ -52,6 +50,9 @@ public class User {
              joinColumns = { @JoinColumn(name = "USER_ID") }, 
              inverseJoinColumns = { @JoinColumn(name = "USER_PROFILE_ID") })
 	private Set<UserProfile> userProfiles = new HashSet<UserProfile>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserVideo> userVideos = new HashSet<UserVideo>();
 
 	public int getId() {
 		return id;
@@ -108,6 +109,14 @@ public class User {
 	public void setUserProfiles(Set<UserProfile> userProfiles) {
 		this.userProfiles = userProfiles;
 	}
+	
+	public Set<UserVideo> getUserVideos() {
+        return userVideos;
+    }
+ 
+    public void setUserVideos(Set<UserVideo> userVideos) {
+        this.userVideos = userVideos;
+    }
 
 	@Override
 	public int hashCode() {

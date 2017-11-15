@@ -13,9 +13,9 @@
 
 <body>
 
- 	<div class="form-container">
+ 	<div class="generic-container">
  	
- 	<h1>New User Registration Form</h1>
+ 	<div class="well lead">New User Registration Form</div>
  	
 	<form:form method="POST" modelAttribute="user" class="form-horizontal">
 
@@ -42,18 +42,6 @@
 				</div>
 			</div>
 		</div>
-
-<%-- 		<div class="row">
-			<div class="form-group col-md-12">
-				<label class="col-md-3 control-lable" for="ssoId">SSO ID</label>
-				<div class="col-md-7">
-					<form:input type="text" path="ssoId" id="ssoId" class="form-control input-sm"/>
-					<div class="has-error">
-						<form:errors path="ssoId" class="help-inline"/>
-					</div>
-				</div>
-			</div>
-		</div> --%>
 
 		<div class="row">
 			<div class="form-group col-md-12">
@@ -94,7 +82,7 @@
 
 		<div class="row">
 			<div class="form-actions floatRight">
-				<input type="submit" value="Register" class="btn btn-primary btn-sm"> or <a href="<c:url value='/admin' />">Cancel</a>
+				<input type="submit" value="Register" class="btn btn-primary btn-sm"> OR <a href="<c:url value='/login' />">Login</a>
 			</div>
 		</div>
 	</form:form>

@@ -28,8 +28,7 @@
 			</list>
 		</property>
 	</bean>
-
-	</bean> -->
+	
 	
 	<bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver"/>
 	
