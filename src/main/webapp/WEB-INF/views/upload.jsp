@@ -17,13 +17,44 @@
 	</div>
 	<div>
  		<form method="POST" action="upload?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data">
-		File to upload: <input type="file" name="file">
+		File to upload: <input type="file" name="file" onchange="setFileInfo(this.files)" accept="video/mp4">
  
 		Name: <input type="text" name="name">
  
  
-		<input type="submit" value="Upload"> Press here to upload the file!
+		<input id="Button" type="submit" value="Upload"> Press here to upload the file!
+		<br/>
+		<div id="infos"></div>
 	</form>
 	</div>
+	<script>
+		var button = document.getElementById("Button");
+		var myVideo;
+		window.URL = window.URL || window.webkitURL;
+		function setFileInfo(files) {
+			myVideo = files[0];
+			var video = document.createElement('video');
+			video.preload = 'metadata';
+			video.onloadedmetadata = function() {
+				window.URL.revokeObjectURL(this.src)
+				var duration = video.duration;
+				myVideo.duration = duration;
+				updateInfos();
+			}
+			video.src = URL.createObjectURL(files[0]);
+		}
+
+		function updateInfos() {
+			document.querySelector('#infos').innerHTML = "";
+			document.querySelector('#infos').innerHTML += "<div>"
+					+ "Duration of the video is : " + myVideo.duration
+					+ '</div>';
+			if(myVideo.duration>600){
+				alert('Sorry');
+				button.disabled = true;
+			}
+		}
+
+	</script>
 </body>
 </html>

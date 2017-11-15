@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import videoupload.model.FileUpload;
-import videoupload.model.Response;
 import videoupload.model.User;
 import videoupload.model.UserProfile;
 import videoupload.service.UserProfileService;
@@ -51,55 +49,43 @@ public class HomePageController {
 		return "upload";
 	}
 	
-	@RequestMapping(value="/upload", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/upload", method=RequestMethod.POST)
     @ResponseBody
-    public Response handleFileUpload(@RequestParam("file") MultipartFile[] file) {
+    public String handleFileUpload(@RequestParam("name") String name,
+    		@RequestParam("file") MultipartFile file) {
 
-        List<String> result = new ArrayList<String>();
-        FileUpload fileUpload = new FileUpload();
-        for (int i = 0; i < file.length; i++) {
-            result.add(fileUpload.process(file[i]));
-        }
+		User currentUser = userService.findByemail(getPrincipal());
 
-        return new Response(result);
+		if (!file.isEmpty()) {
+			try {
+				byte[] bytes = file.getBytes();
+
+				// Creating the directory to store file
+				String rootPath = System.getProperty("catalina.home");
+				File dir = new File(rootPath + File.separator + "resources" + File.separator + "videos" + File.separator + currentUser.getId());
+				if (!dir.exists())
+					dir.mkdirs();
+
+				// Create the file on server
+				File serverFile = new File(dir.getAbsolutePath()
+						+ File.separator + file.getOriginalFilename());
+				BufferedOutputStream stream = new BufferedOutputStream(
+						new FileOutputStream(serverFile));
+				stream.write(bytes);
+				stream.close();
+
+				//logger.info("Server File Location="
+				//		+ serverFile.getAbsolutePath());
+
+				return "You successfully uploaded file=" + file.getOriginalFilename();
+			} catch (Exception e) {
+				return "You failed to upload " + file.getOriginalFilename() + " => " + e.getMessage();
+			}
+		} else {
+			return "You failed to upload " + file.getOriginalFilename()
+					+ " because the file was empty.";
+		}
     }
-	
-//	@RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
-//	public @ResponseBody
-//	String uploadFileHandler(@RequestParam("name") String name,
-//			@RequestParam("file") MultipartFile file) {
-//
-//		if (!file.isEmpty()) {
-//			try {
-//				byte[] bytes = file.getBytes();
-//
-//				// Creating the directory to store file
-//				String rootPath = System.getProperty("catalina.home");
-//				File dir = new File(rootPath + File.separator + "tmpFiles");
-//				if (!dir.exists())
-//					dir.mkdirs();
-//
-//				// Create the file on server
-//				File serverFile = new File(dir.getAbsolutePath()
-//						+ File.separator + name);
-//				BufferedOutputStream stream = new BufferedOutputStream(
-//						new FileOutputStream(serverFile));
-//				stream.write(bytes);
-//				stream.close();
-//
-////				logger.info("Server File Location="
-////						+ serverFile.getAbsolutePath());
-//
-//				return "You successfully uploaded file=" + name;
-//			} catch (Exception e) {
-//				return "You failed to upload " + name + " => " + e.getMessage();
-//			}
-//		} else {
-//			return "You failed to upload " + name
-//					+ " because the file was empty.";
-//		}
-//	}
-
 	
 //	@RequestMapping(value = "/login", method = RequestMethod.POST)
 //	public String adminPage() {
@@ -154,7 +140,7 @@ public class HomePageController {
 		System.out.println("Last Name : "+user.getLastName());
 		System.out.println("Password : "+user.getPassword());
 		System.out.println("Email : "+user.getEmail());
-		System.out.println("Checking UsrProfiles....");
+		System.out.println("Checking UserProfiles....");
 		if(user.getUserProfiles()!=null){
 			for(UserProfile profile : user.getUserProfiles()){
 				System.out.println("Profile : "+ profile.getType());

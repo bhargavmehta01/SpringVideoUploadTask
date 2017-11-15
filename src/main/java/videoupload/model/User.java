@@ -61,14 +61,6 @@ public class User {
 		this.id = id;
 	}
 
-//	public String getSsoId() {
-//		return ssoId;
-//	}
-//
-//	public void setSsoId(String ssoId) {
-//		this.ssoId = ssoId;
-//	}
-
 	public String getPassword() {
 		return password;
 	}
