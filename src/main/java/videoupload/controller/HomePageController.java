@@ -45,7 +45,7 @@ public class HomePageController {
 	/*This is the landing page of the app. 
 	This route redirects the user to "newuser.jsp" page where he/she can register
 	*/
-	@RequestMapping(value = { "/", "/newuser" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/" }, method = RequestMethod.GET)
 	public String homeLoginPage(ModelMap model) {
 		User user = new User();
 		model.addAttribute("user", user);
@@ -122,6 +122,13 @@ public class HomePageController {
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
     public String loginPage() {
         return "login";
+    }
+	
+	@RequestMapping(value = "/newuser", method = RequestMethod.GET)
+    public String newRegistration(ModelMap model) {
+        User user = new User();
+        model.addAttribute("user", user);
+        return "newuser";
     }
 
 	

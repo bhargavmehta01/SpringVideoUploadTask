@@ -31,7 +31,7 @@
 								</div>
 							</c:if>
 							<div class="input-group input-sm">
-								<label class="input-group-addon" for="username"><i
+								<label class="input-group-addon" for="email"><i
 									class="fa fa-user"></i></label> <input type="text" class="form-control"
 									id="email" name="email" placeholder="Enter email address"
 									required>
